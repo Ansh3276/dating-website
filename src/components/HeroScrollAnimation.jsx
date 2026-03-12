@@ -5,9 +5,21 @@ import { preloadImages, getAvailableFrameUrls } from '../animations/imageSequenc
 
 import '../styles/HeroScrollAnimation.css';
 
+/**
+ * Hero Section with Scroll-triggered Animation
+ * Creates cinematic experience with frame-based animation on scroll
+ * Displays quotes with parallax effect
+ */
 const initialUrls = getAvailableFrameUrls();
 const FRAME_COUNT = Math.max(1, initialUrls.length);
 
+/**
+ * CinematicQuote - Animated quote component with fade and slide
+ * @param {Object} props - Component props
+ * @param {string} props.children - Quote text
+ * @param {any} props.progress - Scroll progress value
+ * @param {Array} props.range - Animation range [start, end]
+ */
 const CinematicQuote = ({ children, progress, range }) => {
     const opacity = useTransform(progress, range, [0, 1, 1, 0]);
     const y = useTransform(progress, range, [60, 0, 0, -60]);
