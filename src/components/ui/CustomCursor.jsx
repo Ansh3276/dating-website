@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
+/**
+ * CustomCursor - Premium custom cursor component
+ * Tracks mouse position and provides interactive cursor feedback
+ * Improves UX with visual feedback on interactive elements
+ */
 const CustomCursor = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [cursorVariant, setCursorVariant] = useState("default");
