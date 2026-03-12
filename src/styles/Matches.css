@@ -1,0 +1,216 @@
+/* ── Matches Page ── */
+.matches-page {
+    min-height: 100vh;
+    background: var(--color-bg);
+    padding-top: 90px;
+}
+
+.matches-header {
+    background: white;
+    border-bottom: 1px solid var(--glass-border);
+    padding: 28px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 70px;
+    z-index: 40;
+}
+
+.matches-title h1 {
+    font-size: 2rem;
+    color: var(--color-text);
+    margin-bottom: 2px;
+    line-height: 1;
+}
+
+.matches-title p {
+    font-size: 0.82rem;
+    color: var(--color-primary);
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+}
+
+.matches-filters {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-chip {
+    padding: 9px 18px;
+    border-radius: 100px;
+    border: 1.5px solid var(--glass-border);
+    background: white;
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-dim);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.filter-chip:hover,
+.filter-chip.active {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--color-primary-pale);
+}
+
+/* Grid */
+.matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 28px;
+    padding: 40px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.match-card {
+    border-radius: 24px;
+    overflow: hidden;
+    background: white;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--glass-border);
+    transition: all 0.4s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.match-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--color-primary-light);
+}
+
+.match-card-photo {
+    width: 100%;
+    height: 340px;
+    object-fit: cover;
+    display: block;
+}
+
+.match-card-body {
+    padding: 22px 24px;
+}
+
+.match-card-name {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.match-card-name h3 {
+    font-size: 1.3rem;
+    color: var(--color-text);
+}
+
+.match-card-name span {
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    color: var(--color-text-light);
+    margin-top: 4px;
+}
+
+.match-pct {
+    width: 52px;
+    height: 52px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.match-pct svg { transform: rotate(-90deg); }
+
+.match-pct-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--color-primary);
+}
+
+.match-card-bio {
+    font-size: 0.88rem;
+    color: var(--color-text-dim);
+    line-height: 1.55;
+    margin-bottom: 16px;
+}
+
+.match-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+}
+
+.tag {
+    padding: 4px 12px;
+    background: var(--color-primary-pale);
+    color: var(--color-primary);
+    border-radius: 100px;
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.match-card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-like {
+    flex: 1;
+    padding: 12px;
+    background: white;
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+    border-radius: 100px;
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s var(--ease-expo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-like:hover {
+    background: var(--color-primary-pale);
+    box-shadow: 0 8px 24px var(--color-primary-glow);
+}
+
+.btn-like.liked {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    box-shadow: 0 8px 24px rgba(233, 30, 99, 0.3);
+}
+
+.btn-like.liked:hover {
+    box-shadow: 0 12px 32px rgba(233, 30, 99, 0.45);
+}
+
+.btn-pass {
+    padding: 12px 18px;
+    background: var(--color-bg-section);
+    color: var(--color-text-dim);
+    border: 1.5px solid var(--glass-border);
+    border-radius: 100px;
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-pass:hover { border-color: var(--color-text-dim); color: var(--color-text); }

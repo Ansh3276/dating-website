@@ -1,0 +1,262 @@
+.videodate-page {
+    min-height: 100vh;
+    background: var(--color-bg);
+    padding-top: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 80px;
+}
+
+.videodate-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 0 20px;
+}
+
+.videodate-header .eyebrow {
+    display: inline-block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.videodate-header h1 {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+.videodate-header p {
+    color: var(--color-text-dim);
+    font-size: 1.05rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* ── Video Stage ── */
+.videodate-stage {
+    width: 90%;
+    max-width: 960px;
+    aspect-ratio: 16 / 9;
+    background: #0a0a12;
+    border-radius: 28px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 80px rgba(233, 30, 99, 0.12), 0 0 0 1px rgba(233, 30, 99, 0.08);
+    display: flex;
+}
+
+.video-feed-main {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.video-feed-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-overlay-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 45%;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+}
+
+.video-self {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 160px;
+    height: 120px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.35s var(--ease-expo);
+}
+
+.video-self:hover {
+    transform: scale(1.05);
+}
+
+.video-self img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-partner-name {
+    position: absolute;
+    bottom: 24px;
+    left: 28px;
+    color: white;
+}
+
+.video-partner-name h3 {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 3px;
+    color: #fff;
+}
+
+.video-partner-name span {
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+/* ── Glowing Controls ── */
+.videodate-controls {
+    display: flex;
+    gap: 16px;
+    margin-top: 32px;
+    margin-bottom: 50px;
+}
+
+.vd-control {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.35s var(--ease-expo);
+    background: var(--color-bg-card);
+    color: var(--color-text);
+    box-shadow: var(--card-shadow);
+    position: relative;
+}
+
+.vd-control::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-expo);
+    z-index: -1;
+}
+
+.vd-control:hover {
+    transform: scale(1.12);
+    border-color: var(--color-primary-light);
+}
+
+.vd-control:hover::after {
+    opacity: 1;
+    background: var(--color-primary);
+    filter: blur(12px);
+    opacity: 0.2;
+}
+
+.vd-control.end-call {
+    background: #E91E63;
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 20px rgba(233, 30, 99, 0.3);
+}
+
+.vd-control.end-call:hover {
+    background: #C2185B;
+    box-shadow: 0 0 30px rgba(233, 30, 99, 0.4);
+}
+
+.vd-control.end-call::after {
+    background: #E91E63;
+}
+
+/* ── Feature Cards ── */
+.videodate-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 0 40px;
+    max-width: 960px;
+    width: 100%;
+}
+
+.vd-feature-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    transition: all 0.4s var(--ease-expo);
+    position: relative;
+    overflow: hidden;
+}
+
+.vd-feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 2px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-expo);
+}
+
+.vd-feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: rgba(233, 30, 99, 0.15);
+}
+
+.vd-feature-card:hover::before {
+    opacity: 1;
+}
+
+.vd-feature-icon {
+    font-size: 2.2rem;
+    margin-bottom: 16px;
+}
+
+.vd-feature-card h3 {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 8px;
+}
+
+.vd-feature-card p {
+    color: var(--color-text-dim);
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .videodate-features {
+        grid-template-columns: 1fr;
+        padding: 0 24px;
+    }
+    .videodate-header h1 {
+        font-size: 2.2rem;
+    }
+    .videodate-stage {
+        width: 95%;
+        border-radius: 20px;
+    }
+    .video-self {
+        width: 100px;
+        height: 80px;
+    }
+}

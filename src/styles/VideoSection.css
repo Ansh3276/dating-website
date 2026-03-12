@@ -1,0 +1,183 @@
+/* ── VideoSection Component ── */
+.video-section {
+    position: relative;
+    width: 100%;
+    min-height: 75vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-section--tall {
+    min-height: 100vh;
+}
+
+/* The ambient video fills the section */
+.video-section__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.video-section__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Gradient overlay tunable per variant */
+.video-section__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.video-section--dark .video-section__overlay {
+    background: linear-gradient(135deg,
+        rgba(136, 14, 79, 0.55) 0%,
+        rgba(233, 30, 99, 0.3) 100%
+    );
+}
+
+.video-section--light .video-section__overlay {
+    background: linear-gradient(135deg,
+        rgba(255, 240, 245, 0.7) 0%,
+        rgba(255, 255, 255, 0.5) 100%
+    );
+}
+
+.video-section__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+    padding: 80px 40px;
+}
+
+/* Dark variant — white text */
+.video-section--dark .video-section__content h2,
+.video-section--dark .video-section__content h3 {
+    color: white;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+}
+
+.video-section--dark .video-section__content p {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* Light variant — dark text */
+.video-section--light .video-section__content h2,
+.video-section--light .video-section__content h3 {
+    color: var(--color-text);
+}
+
+.video-section--light .video-section__content p {
+    color: var(--color-text-dim);
+}
+
+.video-section__eyebrow {
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.video-section--dark .video-section__eyebrow {
+    color: var(--color-primary-light);
+}
+
+.video-section--light .video-section__eyebrow {
+    color: var(--color-primary);
+}
+
+.video-section__title {
+    font-size: clamp(2.5rem, 5vw, 5rem);
+    margin-bottom: 20px;
+    line-height: 1.05;
+}
+
+.video-section__body {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    margin-bottom: 40px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.video-section__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 36px;
+    border-radius: 100px;
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: none;
+    transition: all 0.4s var(--ease-expo);
+    border: none;
+}
+
+.video-section--dark .video-section__cta {
+    background: white;
+    color: var(--color-primary);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.video-section--dark .video-section__cta:hover {
+    background: var(--gradient-primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.video-section--light .video-section__cta {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 8px 30px rgba(233, 30, 99, 0.3);
+}
+
+.video-section--light .video-section__cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(233, 30, 99, 0.4);
+}
+
+/* Stats bar inside video sections */
+.video-section__stats {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin-top: 60px;
+}
+
+.video-stat {
+    text-align: center;
+}
+
+.video-stat__number {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.video-section--dark .video-stat__number { color: white; }
+.video-section--light .video-stat__number { color: var(--color-primary); }
+
+.video-stat__label {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+.video-section--dark .video-stat__label { color: rgba(255,255,255,0.5); }
+.video-section--light .video-stat__label { color: var(--color-text-light); }

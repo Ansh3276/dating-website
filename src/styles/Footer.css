@@ -1,0 +1,107 @@
+.premium-footer {
+    background: var(--color-text);
+    padding: 100px 0 50px;
+    position: relative;
+}
+
+/* Subtle pink top border */
+.premium-footer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    opacity: 0.6;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 80px;
+    gap: 60px;
+}
+
+.footer-brand h2 {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    color: white;
+    font-family: var(--font-ui);
+    letter-spacing: 0.1em;
+}
+
+.footer-brand h2 span {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.footer-brand p {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.9rem;
+    max-width: 300px;
+    line-height: 1.7;
+}
+
+.footer-links {
+    display: flex;
+    gap: 80px;
+}
+
+.link-column h4 {
+    color: white;
+    margin-bottom: 24px;
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.12rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.link-column a {
+    display: block;
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    margin-bottom: 14px;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+    font-family: var(--font-ui);
+}
+
+.link-column a:hover { color: var(--color-primary-light); }
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.25);
+    font-family: var(--font-ui);
+}
+
+.social-links {
+    display: flex;
+    gap: 24px;
+}
+
+.social-links a,
+.social-link {
+    color: rgba(255, 255, 255, 0.35) !important;
+    text-decoration: none;
+    font-family: var(--font-ui) !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    transition: color 0.3s ease !important;
+    letter-spacing: 0.05em;
+}
+
+.social-links a:hover,
+.social-link:hover { color: var(--color-primary-light) !important; }

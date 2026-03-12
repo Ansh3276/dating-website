@@ -1,0 +1,236 @@
+.discover-page {
+    min-height: 100vh;
+    background: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 60px;
+}
+
+/* ── Header ── */
+.discover-header {
+    text-align: center;
+    padding: 120px 24px 20px;
+}
+
+.discover-header h1 {
+    font-family: var(--font-heading);
+    font-size: 2.8rem;
+    color: var(--color-text);
+    margin-bottom: 6px;
+}
+
+.discover-header p {
+    color: var(--color-text-dim);
+    font-size: 0.95rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* ── Card Stack ── */
+.discover-container {
+    position: relative;
+    width: 380px;
+    height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px auto 24px;
+}
+
+.discover-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.12);
+    user-select: none;
+    touch-action: none;
+    will-change: transform, opacity;
+}
+
+.discover-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.discover-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 80px 24px 24px;
+    background: linear-gradient(transparent 0%, rgba(0,0,0,0.75) 100%);
+}
+
+.discover-bio {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.discover-card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.discover-card-tags span {
+    padding: 4px 12px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border-radius: 100px;
+    color: #fff;
+    font-family: var(--font-ui);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* ── Swipe Labels ── */
+.swipe-label {
+    position: absolute;
+    top: 40px;
+    padding: 8px 24px;
+    border-radius: 8px;
+    font-family: var(--font-ui);
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    z-index: 5;
+    transform: rotate(-12deg);
+    pointer-events: none;
+}
+
+.like-label {
+    right: 24px;
+    color: var(--color-primary);
+    border: 4px solid var(--color-primary);
+    background: rgba(233, 30, 99, 0.08);
+}
+
+.nope-label {
+    left: 24px;
+    color: #666;
+    border: 4px solid #666;
+    background: rgba(0, 0, 0, 0.05);
+    transform: rotate(12deg);
+}
+
+/* ── Heart Explosion ── */
+.heart-explosion {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.heart-particle {
+    position: absolute;
+    font-size: 1.6rem;
+    pointer-events: none;
+}
+
+/* ── Controls ── */
+.discover-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.control-btn {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    border: 2px solid var(--glass-border);
+    background: var(--color-bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    transition: all 0.35s var(--ease-expo);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.control-btn:hover {
+    transform: scale(1.12);
+}
+
+.btn-pass:hover {
+    border-color: #666;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    color: #666;
+}
+
+.btn-like {
+    color: var(--color-primary);
+}
+
+.btn-like:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 20px var(--color-primary-glow);
+}
+
+/* ── Empty State ── */
+.discover-empty {
+    text-align: center;
+    padding: 60px 20px;
+    width: 100%;
+}
+
+.discover-empty-icon {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.discover-empty h2 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--color-text);
+    margin-bottom: 8px;
+}
+
+.discover-empty p {
+    color: var(--color-text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+}
+
+.reset-btn {
+    padding: 12px 32px;
+    border-radius: 100px;
+    border: none;
+    background: var(--gradient-primary);
+    color: #fff;
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: all 0.35s var(--ease-expo);
+}
+
+.reset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(233, 30, 99, 0.3);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .discover-container { width: calc(100vw - 32px); height: 460px; }
+    .discover-header { padding-top: 100px; }
+    .discover-header h1 { font-size: 2.2rem; }
+    .control-btn { width: 62px; height: 62px; font-size: 1.3rem; }
+}
