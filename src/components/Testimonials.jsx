@@ -3,6 +3,10 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import FadeInBlock from './ui/FadeInBlock';
 import '../styles/Testimonials.css';
 
+/**
+ * Testimonials - User testimonials section with scroll animation
+ * Displays customer success stories with parallax effect on scroll
+ */
 const Testimonials = () => {
     const targetRef = useRef(null);
     const { scrollYProgress } = useScroll({
