@@ -1,6 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+/**
+ * FadeInBlock - Reusable fade-in animation wrapper
+ * Animates elements into view with customizable delay and offset
+ * 
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child elements to animate
+ * @param {string} props.className - Additional CSS classes
+ * @param {number} props.delay - Animation delay in seconds
+ * @param {number} props.yOffset - Initial Y offset in pixels
+ */
 const FadeInBlock = ({ children, className = '', delay = 0, yOffset = 50 }) => {
     return (
         <motion.div
