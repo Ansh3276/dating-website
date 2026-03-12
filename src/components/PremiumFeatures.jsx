@@ -5,6 +5,14 @@ import TiltWrapper from './ui/TiltWrapper';
 import FadeInBlock from './ui/FadeInBlock';
 import '../styles/PremiumFeatures.css';
 
+/**
+ * FeatureCard - Individual feature card with icon and description
+ * @param {Object} props - Component props
+ * @param {React.ElementType} props.icon - Lucide icon component
+ * @param {string} props.title - Feature title
+ * @param {string} props.description - Feature description
+ * @param {number} props.delay - Animation delay
+ */
 const FeatureCard = ({ icon: Icon, title, description, delay }) => {
     return (
         <FadeInBlock delay={delay}>
