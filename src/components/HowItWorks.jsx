@@ -2,6 +2,12 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import '../styles/HowItWorks.css';
 
+/**
+ * HowItWorks - Step-by-step guide component
+ * Displays the dating process workflow with scroll animations
+ * Features numbered steps with descriptions and accents
+ */
+
 const steps = [
     {
         number: '01',
