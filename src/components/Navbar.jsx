@@ -4,13 +4,19 @@ import { Link } from 'react-router-dom';
 import MagneticButton from './ui/MagneticButton';
 import '../styles/Navbar.css';
 
+/**
+ * Premium Navbar Component
+ * Sticky navigation with scroll-based hide/show animation
+ * Features: responsive design, smooth animations, mobile menu
+ */
 const Navbar = () => {
     const { scrollY } = useScroll();
     const [hidden, setHidden] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         const previous = scrollY.getPrevious() ?? 0;
-        // Hide on scroll down, reveal on scroll up
+        // Hide on scroll down, reveal on scroll up for better UX
         if (latest > previous && latest > 200) {
             setHidden(true);
         } else {
