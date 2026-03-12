@@ -1,6 +1,14 @@
 import React, { useRef, useState } from 'react';
 import { motion, useSpring, useTransform } from 'framer-motion';
 
+/**
+ * TiltWrapper - 3D tilt effect based on mouse position
+ * Creates perspective transform following cursor movement
+ * 
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child elements
+ * @param {string} props.className - Additional CSS classes
+ */
 const TiltWrapper = ({ children, className = "" }) => {
     const ref = useRef(null);
     const [rotateX, setRotateX] = useState(0);
