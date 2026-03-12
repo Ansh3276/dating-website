@@ -1,6 +1,15 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
+/**
+ * MagneticButton - Interactive button with cursor-tracking animation
+ * Button moves slightly towards cursor for engaging UX
+ * 
+ * @param {Object} props - Component props  
+ * @param {React.ReactNode} props.children - Button content
+ * @param {string} props.className - Additional CSS classes
+ * @param {Function} props.onClick - Click handler
+ */
 const MagneticButton = ({ children, className = '', onClick }) => {
     const ref = useRef(null);
     const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -9,11 +18,12 @@ const MagneticButton = ({ children, className = '', onClick }) => {
         const { clientX, clientY } = e;
         const { height, width, left, top } = ref.current.getBoundingClientRect();
         
-        // Calculate the center of the button
+        // Calculate the center of the button for accurate positioning
         const middleX = clientX - (left + width / 2);
         const middleY = clientY - (top + height / 2);
         
         // Move slightly towards the cursor (divided by 4 for subtle effect)
+        // Higher divisor = less magnetic attraction
         setPosition({ x: middleX / 4, y: middleY / 4 });
     };
 
