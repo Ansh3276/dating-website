@@ -2,6 +2,10 @@ import React from 'react';
 import MagneticButton from './ui/MagneticButton';
 import '../styles/Footer.css';
 
+/**
+ * Footer - Application footer component
+ * Contains company info, navigation links, and social media
+ */
 const Footer = () => {
     return (
         <footer className="premium-footer">
