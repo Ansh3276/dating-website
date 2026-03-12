@@ -1,3 +1,17 @@
+/* ============================================
+   NAVBAR STYLES - Premium Dating Website
+   Responsive sticky navigation with animations
+   ============================================ */
+
+/* CSS Variables for maintainability */
+:root {
+    --navbar-height: 70px;
+    --navbar-padding-normal: 18px;
+    --navbar-padding-scrolled: 14px;
+    --navbar-backdrop-blur: 20px;
+    --navbar-transition: all 0.5s var(--ease-expo);
+}
+
 .premium-navbar {
     position: fixed;
     top: 0; left: 0;
