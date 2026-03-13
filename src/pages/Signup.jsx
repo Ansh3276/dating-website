@@ -33,6 +33,9 @@ const Signup = () => {
         bio: '', interests: [],
     });
 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
     const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
     const toggleInterest = (i) => {
@@ -43,7 +46,34 @@ const Signup = () => {
         });
     };
 
-    const next = () => step < 3 ? setStep(step + 1) : navigate('/matches');
+    const next = async () => {
+        if (step < 2) {
+            setStep(step + 1);
+        } else if (step === 2) {
+             // Submit to API
+             setError('');
+             setLoading(true);
+             try {
+                 const { register } = await import('../services/api');
+                 await register({
+                     name: form.firstName,
+                     age: form.age,
+                     email: form.email,
+                     password: form.password,
+                     bio: form.bio,
+                     location: 'Local', 
+                     tags: form.interests
+                 });
+                 setStep(3); // Go to done step
+             } catch (err) {
+                 setError(err.response?.data?.message || 'Failed to create account');
+             } finally {
+                 setLoading(false);
+             }
+        } else {
+            navigate('/matches');
+        }
+    };
     const back = () => step > 0 && setStep(step - 1);
 
     return (
@@ -152,9 +182,10 @@ const Signup = () => {
                         </AnimatePresence>
 
                         <div className="signup-nav">
+                            {error && <div className="auth-error" style={{ color: '#ff4b4b', marginBottom: '1rem', width: '100%', textAlign: 'center', fontSize: '0.85rem', fontWeight: 500 }}>{error}</div>}
                             {step > 0 && <button className="auth-btn-social" onClick={back} style={{ width: 'auto', padding: '14px 28px' }}>← Back</button>}
-                            <button className="auth-btn-primary" onClick={next} style={{ flex: 1 }}>
-                                {step === 3 ? 'Explore My Matches →' : step === 2 ? 'Almost There →' : 'Continue →'}
+                            <button className="auth-btn-primary" onClick={next} style={{ flex: 1 }} disabled={loading}>
+                                {loading ? 'Processing...' : (step === 3 ? 'Explore My Matches →' : step === 2 ? 'Almost There →' : 'Continue →')}
                             </button>
                         </div>
 

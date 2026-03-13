@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
 import MagneticButton from './ui/MagneticButton';
 import '../styles/Navbar.css';
 
@@ -12,17 +12,28 @@ import '../styles/Navbar.css';
 const Navbar = () => {
     const { scrollY } = useScroll();
     const [hidden, setHidden] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(true);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const navigate = useNavigate();
+
+    // Check for logged-in user
+    const userString = localStorage.getItem('userInfo');
+    const user = userString ? JSON.parse(userString) : null;
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         const previous = scrollY.getPrevious() ?? 0;
-        // Hide on scroll down, reveal on scroll up for better UX
         if (latest > previous && latest > 200) {
             setHidden(true);
         } else {
             setHidden(false);
         }
+        setScrolled(latest > 50);
     });
+
+    const handleLogout = () => {
+        localStorage.removeItem('userInfo');
+        navigate('/login');
+    };
 
     return (
         <motion.nav
@@ -32,7 +43,7 @@ const Navbar = () => {
             }}
             animate={hidden ? 'hidden' : 'visible'}
             transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className="premium-navbar scrolled"
+            className={`premium-navbar ${scrolled ? 'scrolled' : ''}`}
         >
             <div className="nav-container">
                 <Link to="/" className="nav-logo" data-cursor="pointer">
@@ -48,12 +59,45 @@ const Navbar = () => {
                 </ul>
 
                 <div className="nav-actions">
-                    <Link to="/login" className="login-link" data-cursor="pointer">Log in</Link>
-                    <Link to="/signup">
-                        <MagneticButton className="join-btn" data-cursor="pointer">
-                            Apply Now
-                        </MagneticButton>
-                    </Link>
+                    {user ? (
+                        <div className="nav-user-profile">
+                            <span className="nav-user-name">{user.name}</span>
+                            <div 
+                                className="nav-avatar-wrapper" 
+                                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                data-cursor="pointer"
+                            >
+                                <img 
+                                    src={user.photoUrl || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} 
+                                    alt={user.name} 
+                                    className="nav-avatar" 
+                                />
+                                <AnimatePresence>
+                                    {showProfileMenu && (
+                                        <motion.div 
+                                            className="nav-dropdown"
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <Link to="/profile" className="dropdown-item">Profile</Link>
+                                            <button onClick={handleLogout} className="dropdown-item logout-btn">Logout</button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <Link to="/login" className="login-link" data-cursor="pointer">Log in</Link>
+                            <Link to="/signup">
+                                <MagneticButton className="join-btn" data-cursor="pointer">
+                                    Apply Now
+                                </MagneticButton>
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
         </motion.nav>

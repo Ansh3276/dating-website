@@ -166,17 +166,55 @@ const DiscoverCard = ({ person, onSwipe, isTop, direction }) => {
 
 /* ── Main Page ── */
 const Discover = () => {
-    const [people, setPeople] = useState(DISCOVER_DATA);
+    const [people, setPeople] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [showHearts, setShowHearts] = useState(false);
     const [lastDirection, setLastDirection] = useState(null);
 
-    const handleSwipe = useCallback((direction) => {
+    const loadPeople = async () => {
+        try {
+            const { getDiscoverUsers } = await import('../services/api');
+            const data = await getDiscoverUsers();
+            // Data mapping for local schema
+            const mapped = data.map(u => ({
+                id: u.id,
+                name: u.name,
+                age: u.age,
+                location: u.location,
+                bio: u.bio,
+                image: u.photoUrl || 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&q=80',
+                tags: u.tags || [],
+                compatibility: Math.floor(Math.random() * 15) + 85,
+            }));
+            setPeople(mapped);
+        } catch (err) {
+            console.error('Failed to load people', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    React.useEffect(() => {
+        loadPeople();
+    }, []);
+
+    const handleSwipe = useCallback(async (direction) => {
+        const swipedPerson = people[people.length - 1];
+        if (!swipedPerson) return;
+
         setLastDirection(direction);
         if (direction === 'right') {
             setShowHearts(true);
             setTimeout(() => setShowHearts(false), 900);
         }
-        console.log(`Swiped ${direction} on ${people[people.length - 1].name}`);
+
+        try {
+            const { actionUser } = await import('../services/api');
+            await actionUser(swipedPerson.id, direction === 'right' ? 'liked' : 'passed');
+        } catch (err) {
+            console.error('Failed to record swipe', err);
+        }
+
         setPeople(prev => prev.slice(0, -1));
     }, [people]);
 

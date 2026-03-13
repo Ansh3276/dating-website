@@ -1,147 +1,179 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import MagneticButton from '../components/ui/MagneticButton';
+import FloatingBackground from '../components/ui/FloatingBackground';
 import '../styles/Profile.css';
 
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.1,
-            delayChildren: 0.2
-        }
-    }
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-        opacity: 1,
-        y: 0,
-        transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
-    }
-};
+const NO_DP = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
 const Profile = () => {
+    const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editForm, setEditForm] = useState({});
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const { getProfile } = await import('../services/api');
+                const data = await getProfile();
+                setUser(data);
+                setEditForm(data);
+            } catch (err) {
+                console.error('Failed to fetch profile', err);
+                const message = err.response?.data?.message || 'Failed to load profile. Please try logging in again.';
+                setError(message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfile();
+    }, []);
+
+    const handleSave = async () => {
+        try {
+            const { updateProfile } = await import('../services/api');
+            const updated = await updateProfile({
+                ...editForm,
+                // Ensure tags are handled as an array if they were edited as a string
+                tags: Array.isArray(editForm.tags) ? editForm.tags : editForm.tags.split(',').map(s => s.trim())
+            });
+            setUser(updated);
+            
+            // CRITICAL: Preserve the token when updating localStorage
+            const existingInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            localStorage.setItem('userInfo', JSON.stringify({ ...existingInfo, ...updated }));
+            
+            setIsEditing(false);
+            window.location.reload(); // Quick way to sync all components like Navbar
+        } catch (err) {
+            console.error('Failed to update profile', err);
+            setError('Failed to save changes.');
+        }
+    };
+
+    if (loading) return <div className="loading-screen">Loading your profile...</div>;
+    if (!user) return <div className="error-screen">{error || 'No user found.'}</div>;
+
     return (
         <>
+            <FloatingBackground />
             <Navbar />
             <div className="profile-page">
-                {/* Banner */}
-                <div className="profile-banner">
-                    <img
-                        src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1400&q=90"
-                        alt="Sophia Reeves"
-                    />
-                    <div className="profile-banner-overlay" />
-                    <div className="profile-banner-text">
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
-                        >
-                            Sophia Reeves, 27
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 0.3 }}
-                        >
-                            📍 New York City · Member since 2024
-                        </motion.p>
+                <motion.div 
+                    className="profile-container"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <div className="profile-header-card">
+                        <div className="profile-avatar-section">
+                            <div className="profile-main-avatar">
+                                <img src={user.photoUrl || NO_DP} alt={user.name} />
+                                {isEditing && (
+                                    <div className="avatar-edit-overlay">
+                                        <input 
+                                            type="text" 
+                                            placeholder="Image URL..." 
+                                            value={editForm.photoUrl || ''} 
+                                            onChange={(e) => setEditForm({...editForm, photoUrl: e.target.value})}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="profile-primary-info">
+                                {isEditing ? (
+                                    <div className="edit-fields-stack">
+                                        <input 
+                                            className="edit-input-large"
+                                            value={editForm.name} 
+                                            onChange={(e) => setEditForm({...editForm, name: e.target.value})} 
+                                            placeholder="Your Name"
+                                        />
+                                        <input 
+                                            className="edit-input-small"
+                                            type="number"
+                                            value={editForm.age} 
+                                            onChange={(e) => setEditForm({...editForm, age: e.target.value})} 
+                                            placeholder="Age"
+                                        />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <h1>{user.name}, {user.age}</h1>
+                                        <p className="profile-loc">📍 {user.location || 'Not specified'}</p>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="profile-header-actions">
+                            {isEditing ? (
+                                <>
+                                    <button className="btn-cancel" onClick={() => setIsEditing(false)}>Cancel</button>
+                                    <button className="btn-save" onClick={handleSave}>Save Changes</button>
+                                </>
+                            ) : (
+                                <button className="btn-edit-toggle" onClick={() => setIsEditing(true)}>Edit Profile</button>
+                            )}
+                        </div>
                     </div>
-                    <Link to="/matches">
-                        <button className="profile-edit-btn">← Back to Matches</button>
-                    </Link>
-                </div>
 
-                {/* Stats */}
-                <div className="profile-stats">
-                    {[
-                        { val: '96%', key: 'Compatibility' },
-                        { val: '2.4k', key: 'Profile Views' },
-                        { val: '148', key: 'Likes Received' },
-                        { val: '12', key: 'Connections' },
-                    ].map(s => (
-                        <div key={s.key} className="profile-stat">
-                            <div className="stat-val">{s.val}</div>
-                            <div className="stat-key">{s.key}</div>
+                    <div className="profile-grid">
+                        <div className="profile-main-content">
+                            <section className="profile-section">
+                                <h3>About Me</h3>
+                                {isEditing ? (
+                                    <textarea 
+                                        className="edit-textarea"
+                                        value={editForm.bio} 
+                                        onChange={(e) => setEditForm({...editForm, bio: e.target.value})}
+                                        placeholder="Write your story..."
+                                    />
+                                ) : (
+                                    <p>{user.bio || "No bio yet. Tell the world about yourself!"}</p>
+                                )}
+                            </section>
+
+                            <section className="profile-section">
+                                <h3>Passions</h3>
+                                {isEditing ? (
+                                    <input 
+                                        className="edit-input-full"
+                                        value={Array.isArray(editForm.tags) ? editForm.tags.join(', ') : editForm.tags} 
+                                        onChange={(e) => setEditForm({...editForm, tags: e.target.value})}
+                                        placeholder="Travel, Jazz, Reading (comma separated)"
+                                    />
+                                ) : (
+                                    <div className="profile-tags-grid">
+                                        {(user.tags || []).map(tag => (
+                                            <span key={tag} className="profile-tag">{tag}</span>
+                                        ))}
+                                    </div>
+                                )}
+                            </section>
                         </div>
-                    ))}
-                </div>
 
-                {/* Body */}
-                <div className="profile-body">
-                    {/* Left column */}
-                    <motion.div
-                        className="profile-left"
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                        <motion.div variants={itemVariants}>
-                            <p className="profile-section-title">About Sophia</p>
-                            <p className="profile-bio-text">
-                                Architecture lover, early riser, and firm believer that the best conversations happen over 
-                                candlelit dinners. I spend my weekends exploring the hidden courtyards of the city and my 
-                                weeknights sketching buildings I'll probably never build. I'm looking for someone who finds 
-                                beauty in the details — in design, in food, in people.
-                            </p>
-                        </motion.div>
-
-                        <motion.div variants={itemVariants}>
-                            <p className="profile-section-title">Passions</p>
-                            <div className="profile-interests">
-                                {['Architecture 🏛️','Travel ✈️','Fine Dining 🍷','Photography 📸','Film 🎬','Art 🎨','Early Mornings ☀️'].map(t => (
-                                    <span key={t} className="profile-interest-tag">{t}</span>
-                                ))}
-                            </div>
-                        </motion.div>
-
-                        <motion.div variants={itemVariants}>
-                            <p className="profile-section-title">Looking For</p>
-                            <p className="profile-bio-text">
-                                A thoughtful connection — someone who's equally comfortable at a gallery opening and a 
-                                farmers market. Intelligence is non-negotiable, kindness is everything.
-                            </p>
-                        </motion.div>
-                    </motion.div>
-
-                    {/* Right sidebar */}
-                    <motion.div
-                        className="profile-right"
-                        variants={itemVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                        <div className="profile-sidebar-card">
-                            <h3>Quick Details</h3>
-                            {([
-                                { k: 'Age', v: '27' },
-                                { k: 'Location', v: 'New York City' },
-                                { k: 'Profession', v: 'Architect' },
-                                { k: 'Height', v: '5\'7"' },
-                                { k: 'Education', v: 'Columbia University' },
-                                { k: 'Relationship', v: 'Serious connection' },
-                                { k: 'Lifestyle', v: 'Active & Social' },
-                            ]).map(r => (
-                                <div key={r.k} className="profile-detail-row">
-                                    <span>{r.k}</span>
-                                    <span>{r.v}</span>
+                        <aside className="profile-sidebar">
+                            <div className="sidebar-card">
+                                <h4>Compatibility Score</h4>
+                                <div className="comp-circle">
+                                    <svg viewBox="0 0 36 36">
+                                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" strokeWidth="3" />
+                                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E91E63" strokeWidth="3" strokeDasharray="95, 100" />
+                                    </svg>
+                                    <span>95%</span>
                                 </div>
-                            ))}
-                            <div className="profile-actions" style={{ marginTop: '24px' }}>
-                                <MagneticButton className="profile-msg-btn" data-cursor="pointer">
-                                    💬 Send a Message
-                                </MagneticButton>
+                                <p>Your profile is highly optimized for meaningful connections.</p>
                             </div>
-                        </div>
-                    </motion.div>
-                </div>
+                        </aside>
+                    </div>
+                </motion.div>
             </div>
+            {error && <div className="global-error-toast">{error}</div>}
         </>
     );
 };

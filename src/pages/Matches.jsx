@@ -90,6 +90,34 @@ const Matches = () => {
     const navigate = useNavigate();
     const [active, setActive] = useState('All');
     const [liked, setLiked] = useState(new Set());
+    const [matchList, setMatchList] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const loadMatches = async () => {
+        try {
+            const { getMatches } = await import('../services/api');
+            const data = await getMatches();
+            const mapped = data.map(u => ({
+                id: u.id,
+                name: u.name,
+                age: u.age,
+                location: u.location,
+                bio: u.bio,
+                photo: u.photoUrl || 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=85',
+                tags: u.tags || [],
+                pct: u.pct || 90
+            }));
+            setMatchList(mapped);
+        } catch (err) {
+            console.error('Failed to load matches', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    React.useEffect(() => {
+        loadMatches();
+    }, []);
 
     const toggleLike = (id) => {
         const s = new Set(liked);
@@ -122,55 +150,64 @@ const Matches = () => {
 
                 {/* Grid */}
                 <div className="matches-grid">
-                    {MATCHES.map((m, i) => (
-                        <motion.div
-                            key={m.id}
-                            className="match-card"
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: i * 0.07 }}
-                        >
-                            <img
-                                className="match-card-photo"
-                                src={m.photo}
-                                alt={m.name}
-                                onClick={() => navigate('/profile')}
-                                style={{ cursor: 'pointer' }}
-                            />
-                            <div className="match-card-body">
-                                <div className="match-card-name">
-                                    <div>
-                                        <h3>{m.name}</h3>
-                                        <span>{m.age} · {m.location}</span>
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: '4rem', gridColumn: '1/-1' }}>Loading matches...</div>
+                    ) : matchList.length > 0 ? (
+                        matchList.map((m, i) => (
+                            <motion.div
+                                key={m.id}
+                                className="match-card"
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: i * 0.07 }}
+                            >
+                                <img
+                                    className="match-card-photo"
+                                    src={m.photo}
+                                    alt={m.name}
+                                    onClick={() => navigate('/profile')}
+                                    style={{ cursor: 'pointer' }}
+                                />
+                                <div className="match-card-body">
+                                    <div className="match-card-name">
+                                        <div>
+                                            <h3>{m.name}</h3>
+                                            <span>{m.age} · {m.location}</span>
+                                        </div>
+                                        <Ring pct={m.pct} />
                                     </div>
-                                    <Ring pct={m.pct} />
-                                </div>
-                                <p className="match-card-bio">{m.bio}</p>
-                                <div className="match-card-tags">
-                                    {m.tags.map(t => <span key={t} className="tag">{t}</span>)}
-                                </div>
-                                <div className="match-card-actions">
-                                    <motion.button
-                                        className={`btn-like ${liked.has(m.id) ? 'liked' : ''}`}
-                                        onClick={() => toggleLike(m.id)}
-                                        whileTap={{ scale: 0.95 }}
-                                        whileHover={{ scale: 1.02 }}
-                                    >
-                                        <motion.span 
-                                            initial={false}
-                                            animate={{ scale: liked.has(m.id) ? [1, 1.4, 1] : 1 }}
-                                            transition={{ duration: 0.3 }}
-                                            style={{ display: 'inline-block', marginRight: '6px' }}
+                                    <p className="match-card-bio">{m.bio}</p>
+                                    <div className="match-card-tags">
+                                        {m.tags.map(t => <span key={t} className="tag">{t}</span>)}
+                                    </div>
+                                    <div className="match-card-actions">
+                                        <motion.button
+                                            className={`btn-like ${liked.has(m.id) ? 'liked' : ''}`}
+                                            onClick={() => toggleLike(m.id)}
+                                            whileTap={{ scale: 0.95 }}
+                                            whileHover={{ scale: 1.02 }}
                                         >
-                                            {liked.has(m.id) ? '❤' : '♡'}
-                                        </motion.span>
-                                        {liked.has(m.id) ? 'Interested' : 'Send Interest'}
-                                    </motion.button>
-                                    <button className="btn-pass" data-cursor="pointer">Pass</button>
+                                            <motion.span 
+                                                initial={false}
+                                                animate={{ scale: liked.has(m.id) ? [1, 1.4, 1] : 1 }}
+                                                transition={{ duration: 0.3 }}
+                                                style={{ display: 'inline-block', marginRight: '6px' }}
+                                            >
+                                                {liked.has(m.id) ? '❤' : '♡'}
+                                            </motion.span>
+                                            {liked.has(m.id) ? 'Interested' : 'Send Interest'}
+                                        </motion.button>
+                                        <button className="btn-pass" data-cursor="pointer">Pass</button>
+                                    </div>
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
+                            </motion.div>
+                        ))
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: '4rem', gridColumn: '1/-1' }}>
+                            <p>No matches yet. Keep discovering!</p>
+                            <Link to="/discover" className="auth-btn-primary" style={{ display: 'inline-block', width: 'auto', marginTop: '1rem' }}>Go to Discover</Link>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

@@ -8,13 +8,24 @@ import '../styles/Auth.css';
 const Login = () => {
     const navigate = useNavigate();
     const [form, setForm] = useState({ email: '', password: '' });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Navigate to matches after "login"
-        navigate('/matches');
+        setError('');
+        setLoading(true);
+        try {
+            const { login } = await import('../services/api');
+            await login(form.email, form.password);
+            navigate('/matches');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to login');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -65,8 +76,10 @@ const Login = () => {
                                 </div>
                             </div>
 
-                            <button className="auth-btn-primary" type="submit">
-                                Sign In
+                            {error && <div className="auth-error" style={{ color: '#ff4b4b', marginBottom: '1rem', fontSize: '0.85rem', fontWeight: 500 }}>{error}</div>}
+
+                            <button className="auth-btn-primary" type="submit" disabled={loading}>
+                                {loading ? 'Signing in...' : 'Sign In'}
                             </button>
                         </form>
 
