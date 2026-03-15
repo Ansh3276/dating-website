@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import FloatingBackground from '../components/ui/FloatingBackground';
+import { getPhotoUrl } from '../services/api';
 import '../styles/Profile.css';
 
 const NO_DP = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
@@ -14,14 +15,37 @@ const Profile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState({});
     const [error, setError] = useState('');
+    const [imagePreview, setImagePreview] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const API_BASE = 'http://localhost:5000'; // Define backend base
+
+    const calculateCompletion = (u) => {
+        let score = 0;
+        if (u.name) score += 20;
+        if (u.age) score += 10;
+        if (u.bio) score += 20;
+        if (u.photoUrl) score += 20;
+        if (u.gender) score += 15;
+        if (u.showMe) score += 15;
+        return score;
+    };
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 const { getProfile } = await import('../services/api');
                 const data = await getProfile();
+                if (typeof data.tags === 'string') {
+                    try {
+                        data.tags = JSON.parse(data.tags);
+                    } catch (e) {
+                         data.tags = [];
+                    }
+                }
                 setUser(data);
                 setEditForm(data);
+                setImagePreview(getPhotoUrl(data.photoUrl));
             } catch (err) {
                 console.error('Failed to fetch profile', err);
                 const message = err.response?.data?.message || 'Failed to load profile. Please try logging in again.';
@@ -36,22 +60,44 @@ const Profile = () => {
     const handleSave = async () => {
         try {
             const { updateProfile } = await import('../services/api');
-            const updated = await updateProfile({
-                ...editForm,
-                // Ensure tags are handled as an array if they were edited as a string
-                tags: Array.isArray(editForm.tags) ? editForm.tags : editForm.tags.split(',').map(s => s.trim())
-            });
+            
+            // Use FormData for possible file upload
+            const formData = new FormData();
+            formData.append('name', editForm.name || '');
+            formData.append('age', editForm.age || '');
+            formData.append('bio', editForm.bio || '');
+            formData.append('location', editForm.location || '');
+            formData.append('gender', editForm.gender || '');
+            formData.append('showMe', editForm.showMe || '');
+            
+            const tags = Array.isArray(editForm.tags) ? editForm.tags : editForm.tags?.split(',').map(s => s.trim()) || [];
+            formData.append('tags', JSON.stringify(tags));
+
+            if (selectedFile) {
+                formData.append('photo', selectedFile);
+            }
+
+            const updated = await updateProfile(formData);
             setUser(updated);
             
-            // CRITICAL: Preserve the token when updating localStorage
-            const existingInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-            localStorage.setItem('userInfo', JSON.stringify({ ...existingInfo, ...updated }));
-            
             setIsEditing(false);
-            window.location.reload(); // Quick way to sync all components like Navbar
+            setImagePreview(getPhotoUrl(updated.photoUrl));
+            window.location.reload(); 
         } catch (err) {
             console.error('Failed to update profile', err);
             setError('Failed to save changes.');
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -72,16 +118,17 @@ const Profile = () => {
                     <div className="profile-header-card">
                         <div className="profile-avatar-section">
                             <div className="profile-main-avatar">
-                                <img src={user.photoUrl || NO_DP} alt={user.name} />
+                                <img src={imagePreview || NO_DP} alt={user.name} />
                                 {isEditing && (
-                                    <div className="avatar-edit-overlay">
+                                    <label className="avatar-edit-overlay">
                                         <input 
-                                            type="text" 
-                                            placeholder="Image URL..." 
-                                            value={editForm.photoUrl || ''} 
-                                            onChange={(e) => setEditForm({...editForm, photoUrl: e.target.value})}
+                                            type="file" 
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            style={{ display: 'none' }}
                                         />
-                                    </div>
+                                        <span className="upload-icon">📷 Update Photo</span>
+                                    </label>
                                 )}
                             </div>
                             <div className="profile-primary-info">
@@ -104,7 +151,10 @@ const Profile = () => {
                                 ) : (
                                     <>
                                         <h1>{user.name}, {user.age}</h1>
-                                        <p className="profile-loc">📍 {user.location || 'Not specified'}</p>
+                                        <div className="profile-meta-row">
+                                            <p className="profile-loc">📍 {user.location || 'Local'}</p>
+                                            <span className="profile-gender-tag">{user.gender || 'Not set'}</span>
+                                        </div>
                                     </>
                                 )}
                             </div>
@@ -138,7 +188,7 @@ const Profile = () => {
                                 )}
                             </section>
 
-                            <section className="profile-section">
+                             <section className="profile-section">
                                 <h3>Passions</h3>
                                 {isEditing ? (
                                     <input 
@@ -155,19 +205,63 @@ const Profile = () => {
                                     </div>
                                 )}
                             </section>
+
+                            <section className="profile-section">
+                                <h3>Identity & Preferences</h3>
+                                <div className="identity-grid">
+                                    <div className="identity-item">
+                                        <label>Gender</label>
+                                        {isEditing ? (
+                                            <select 
+                                                value={editForm.gender} 
+                                                onChange={(e) => setEditForm({...editForm, gender: e.target.value})}
+                                            >
+                                                <option value="">Select...</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="non-binary">Non-binary</option>
+                                            </select>
+                                        ) : (
+                                            <p className="val">{user.gender || 'Not specified'}</p>
+                                        )}
+                                    </div>
+                                    <div className="identity-item">
+                                        <label>Interested In</label>
+                                        {isEditing ? (
+                                            <select 
+                                                value={editForm.showMe} 
+                                                onChange={(e) => setEditForm({...editForm, showMe: e.target.value})}
+                                            >
+                                                <option value="">Select...</option>
+                                                <option value="women">Women</option>
+                                                <option value="men">Men</option>
+                                                <option value="everyone">Everyone</option>
+                                            </select>
+                                        ) : (
+                                            <p className="val">{user.showMe || 'Everyone'}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </section>
                         </div>
 
                         <aside className="profile-sidebar">
                             <div className="sidebar-card">
                                 <h4>Compatibility Score</h4>
-                                <div className="comp-circle">
+                                 <div className="comp-circle">
                                     <svg viewBox="0 0 36 36">
                                         <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" strokeWidth="3" />
-                                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E91E63" strokeWidth="3" strokeDasharray="95, 100" />
+                                        <path 
+                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                            fill="none" 
+                                            stroke="#E91E63" 
+                                            strokeWidth="3" 
+                                            strokeDasharray={`${calculateCompletion(user)}, 100`} 
+                                        />
                                     </svg>
-                                    <span>95%</span>
+                                    <span>{calculateCompletion(user)}%</span>
                                 </div>
-                                <p>Your profile is highly optimized for meaningful connections.</p>
+                                <p>Complete your profile to unlock deeper connections.</p>
                             </div>
                         </aside>
                     </div>

@@ -1,16 +1,9 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const { User } = require('../models');
-
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'secret', {
-    expiresIn: '30d',
-  });
-};
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, name, age, location, bio } = req.body;
+    const { email, password, name, age, location, bio, gender, showMe, tags } = req.body;
 
     const userExists = await User.findOne({ where: { email } });
     if (userExists) {
@@ -27,14 +20,17 @@ exports.register = async (req, res) => {
       age,
       location,
       bio,
+      gender,
+      showMe,
+      tags
     });
 
     if (user) {
+      req.session.userId = user.id; // Set session ID
       res.status(201).json({
         id: user.id,
         name: user.name,
         email: user.email,
-        token: generateToken(user.id),
       });
     } else {
       res.status(400).json({ message: 'Invalid user data' });
@@ -50,15 +46,39 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ where: { email } });
 
     if (user && (await bcrypt.compare(password, user.password))) {
+      req.session.userId = user.id; // Set session ID
       res.json({
         id: user.id,
         name: user.name,
         email: user.email,
-        token: generateToken(user.id),
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
     }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.logout = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: 'Could not log out' });
+    }
+    res.clearCookie('connect.sid'); // Assuming default session cookie name
+    res.json({ message: 'Logged out successfully' });
+  });
+};
+
+exports.getMe = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: { exclude: ['password'] }
+    });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

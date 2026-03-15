@@ -84,6 +84,42 @@
     box-shadow: 0 4px 16px rgba(233,30,99,0.2);
 }
 
+.signup-gender-section, .signup-preference-section {
+    margin-top: 20px;
+}
+
+.gender-grid, .preference-grid {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.gender-btn, .pref-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1.5px solid var(--glass-border);
+    background: white;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--color-text-dim);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.gender-btn:hover, .pref-btn:hover {
+    border-color: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.gender-btn.active, .pref-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(233,30,99,0.2);
+}
+
 .done-icon {
     font-size: 4rem;
     margin-bottom: 20px;

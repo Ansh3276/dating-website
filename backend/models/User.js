@@ -35,6 +35,12 @@ const User = sequelize.define('User', {
   photoUrl: {
     type: DataTypes.STRING,
   },
+  gender: {
+    type: DataTypes.STRING, // male, female, non-binary, etc.
+  },
+  showMe: {
+    type: DataTypes.STRING, // men, women, everyone
+  },
   tags: {
     type: DataTypes.JSON, // Supported in MySQL 5.7.8+
   },
