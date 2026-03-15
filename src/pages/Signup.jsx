@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import FloatingBackground from '../components/ui/FloatingBackground';
 import '../styles/Auth.css';
 import '../styles/Signup.css';
+import { useAuth } from '../context/AuthContext';
 
 const STEPS = [
     { id: 0, label: 'About You' },
@@ -31,10 +32,12 @@ const Signup = () => {
     const [form, setForm] = useState({
         firstName: '', age: '', email: '', password: '',
         bio: '', interests: [],
+        gender: '', showMe: ''
     });
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const { login: contextLogin } = useAuth();
 
     const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -54,16 +57,18 @@ const Signup = () => {
              setError('');
              setLoading(true);
              try {
-                 const { register } = await import('../services/api');
-                 await register({
+                 const userData = await register({
                      name: form.firstName,
                      age: form.age,
                      email: form.email,
                      password: form.password,
                      bio: form.bio,
+                     gender: form.gender,
+                     showMe: form.showMe,
                      location: 'Local', 
                      tags: form.interests
                  });
+                 contextLogin(userData);
                  setStep(3); // Go to done step
              } catch (err) {
                  setError(err.response?.data?.message || 'Failed to create account');
@@ -129,6 +134,22 @@ const Signup = () => {
                                             <input className="field-input" name="password" type="password" placeholder="••••••••" value={form.password} onChange={change} />
                                         </div>
                                     </div>
+
+                                    <div className="signup-gender-section">
+                                        <label className="field-label">I am...</label>
+                                        <div className="gender-grid">
+                                            {['male', 'female', 'non-binary'].map(g => (
+                                                <button 
+                                                    key={g}
+                                                    type="button" 
+                                                    className={`gender-btn ${form.gender === g ? 'active' : ''}`}
+                                                    onClick={() => setForm({...form, gender: g})}
+                                                >
+                                                    {g.charAt(0).toUpperCase() + g.slice(1)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </motion.div>
                             )}
 
@@ -168,6 +189,26 @@ const Signup = () => {
                                                 {interest}
                                             </button>
                                         ))}
+                                    </div>
+
+                                    <div className="signup-preference-section" style={{ marginTop: '24px' }}>
+                                        <label className="field-label">Show me...</label>
+                                        <div className="preference-grid">
+                                            {[
+                                                { val: 'women', label: 'Women' },
+                                                { val: 'men', label: 'Men' },
+                                                { val: 'everyone', label: 'Everyone' }
+                                            ].map(p => (
+                                                <button 
+                                                    key={p.val}
+                                                    type="button" 
+                                                    className={`pref-btn ${form.showMe === p.val ? 'active' : ''}`}
+                                                    onClick={() => setForm({...form, showMe: p.val})}
+                                                >
+                                                    {p.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </motion.div>
                             )}

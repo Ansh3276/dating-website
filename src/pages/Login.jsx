@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import FloatingBackground from '../components/ui/FloatingBackground';
+import { useAuth } from '../context/AuthContext';
 import '../styles/Auth.css';
 
 const Login = () => {
@@ -10,6 +11,7 @@ const Login = () => {
     const [form, setForm] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const { login: contextLogin } = useAuth();
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -19,8 +21,9 @@ const Login = () => {
         setLoading(true);
         try {
             const { login } = await import('../services/api');
-            await login(form.email, form.password);
-            navigate('/matches');
+            const userData = await login(form.email, form.password);
+            contextLogin(userData);
+            navigate('/discover');
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to login');
         } finally {

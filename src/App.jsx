@@ -4,6 +4,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import CursorFollower from './components/ui/CursorFollower';
 import SmoothScroll from './components/ui/SmoothScroll';
+import { SocketProvider } from './context/SocketContext';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import GuestRoute from './components/GuestRoute';
+import SocketNotifications from './components/ui/SocketNotifications';
 
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -40,16 +45,21 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Landing /></PageTransition>} />
-        <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
-        <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
-        <Route path="/matches" element={<PageTransition><Matches /></PageTransition>} />
-        <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+        
+        {/* Guest only routes */}
+        <Route path="/login" element={<PageTransition><GuestRoute><Login /></GuestRoute></PageTransition>} />
+        <Route path="/signup" element={<PageTransition><GuestRoute><Signup /></GuestRoute></PageTransition>} />
+        
+        {/* Protected routes */}
+        <Route path="/matches" element={<PageTransition><ProtectedRoute><Matches /></ProtectedRoute></PageTransition>} />
+        <Route path="/profile" element={<PageTransition><ProtectedRoute><Profile /></ProtectedRoute></PageTransition>} />
+        <Route path="/discover" element={<PageTransition><ProtectedRoute><Discover /></ProtectedRoute></PageTransition>} />
+        <Route path="/chat" element={<PageTransition><ProtectedRoute><Chat /></ProtectedRoute></PageTransition>} />
+        
         <Route path="/membership" element={<PageTransition><Membership /></PageTransition>} />
-        <Route path="/discover" element={<PageTransition><Discover /></PageTransition>} />
-        <Route path="/chat" element={<PageTransition><Chat /></PageTransition>} />
-        <Route path="/video-date" element={<PageTransition><VideoDate /></PageTransition>} />
-        <Route path="/notifications" element={<PageTransition><Notifications /></PageTransition>} />
-        <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
+        <Route path="/video-date" element={<PageTransition><ProtectedRoute><VideoDate /></ProtectedRoute></PageTransition>} />
+        <Route path="/notifications" element={<PageTransition><ProtectedRoute><Notifications /></ProtectedRoute></PageTransition>} />
+        <Route path="/settings" element={<PageTransition><ProtectedRoute><Settings /></ProtectedRoute></PageTransition>} />
       </Routes>
     </AnimatePresence>
   );
@@ -57,12 +67,17 @@ const AnimatedRoutes = () => {
 
 function App() {
   return (
-    <Router>
-      <SmoothScroll>
-        <CursorFollower />
-        <AnimatedRoutes />
-      </SmoothScroll>
-    </Router>
+    <AuthProvider>
+      <SocketProvider>
+        <Router>
+          <SocketNotifications />
+          <SmoothScroll>
+            <CursorFollower />
+            <AnimatedRoutes />
+          </SmoothScroll>
+        </Router>
+      </SocketProvider>
+    </AuthProvider>
   );
 }
 
