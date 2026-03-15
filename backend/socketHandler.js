@@ -1,7 +1,10 @@
 const { Server } = require('socket.io');
 
 let io;
-const onlineUsers = new Map(); // Maps userId -> socket.id
+// userConnections maps userId -> Set of socketIds
+const userConnections = new Map(); 
+// socketToUser maps socketId -> userId for quick lookup on disconnect
+const socketToUser = new Map(); 
 
 exports.initSocket = (server) => {
     io = new Server(server, {
@@ -18,26 +21,36 @@ exports.initSocket = (server) => {
         // Frontend fires this when a user logs in or mounts the app
         socket.on('register', (userId) => {
             if (!userId) return;
-            onlineUsers.set(userId, socket.id);
+            
+            socketToUser.set(socket.id, userId);
+            
+            if (!userConnections.has(userId)) {
+                userConnections.set(userId, new Set());
+            }
+            userConnections.get(userId).add(socket.id);
+            
             console.log(`User ${userId} registered to socket ${socket.id}`);
             
             // Broadcast to everyone that the active user list changed
-            io.emit('onlineUsers', Array.from(onlineUsers.keys()));
+            io.emit('onlineUsers', Array.from(userConnections.keys()));
         });
 
         socket.on('disconnect', () => {
-            let disconnectedUserId = null;
-            // Find the user associated with this socket
-            for (let [userId, socketId] of onlineUsers.entries()) {
-                if (socketId === socket.id) {
-                    disconnectedUserId = userId;
-                    onlineUsers.delete(userId);
-                    break;
+            const userId = socketToUser.get(socket.id);
+            if (userId) {
+                const userSockets = userConnections.get(userId);
+                if (userSockets) {
+                    userSockets.delete(socket.id);
+                    // If the user has no more active socket connections, they are truly offline
+                    if (userSockets.size === 0) {
+                        userConnections.delete(userId);
+                        console.log(`User ${userId} fully disconnected (Offline).`);
+                        io.emit('onlineUsers', Array.from(userConnections.keys()));
+                    } else {
+                        console.log(`User ${userId} disconnected a tab, but still has ${userSockets.size} active connections.`);
+                    }
                 }
-            }
-            if (disconnectedUserId) {
-                console.log(`User ${disconnectedUserId} disconnected.`);
-                io.emit('onlineUsers', Array.from(onlineUsers.keys()));
+                socketToUser.delete(socket.id);
             }
         });
     });
@@ -46,8 +59,11 @@ exports.initSocket = (server) => {
 exports.getIo = () => io;
 
 exports.emitToUser = (userId, event, data) => {
-    const socketId = onlineUsers.get(userId);
-    if (socketId && io) {
-        io.to(socketId).emit(event, data);
+    const userSockets = userConnections.get(userId);
+    if (userSockets && io) {
+        // Emit to all active sockets for this user
+        for (const socketId of userSockets) {
+            io.to(socketId).emit(event, data);
+        }
     }
 };

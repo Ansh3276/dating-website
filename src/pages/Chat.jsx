@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { getPhotoUrl } from '../services/api';
+import { useSocket } from '../context/SocketContext';
 import '../styles/Chat.css';
 
 const Chat = () => {
@@ -14,6 +15,7 @@ const Chat = () => {
     const [loading, setLoading] = useState(true);
     const messagesEndRef = React.useRef(null);
     const [currentUser, setCurrentUser] = useState(null);
+    const { onlineUsers } = useSocket();
 
     React.useEffect(() => {
         const fetchUser = async () => {
@@ -68,7 +70,7 @@ const Chat = () => {
 
     React.useEffect(() => {
         loadConversations();
-    }, []);
+    }, [location.state?.userId]); // Re-run if a new userId is passed in navigation state
 
     React.useEffect(() => {
         if (selected) {
@@ -129,7 +131,10 @@ const Chat = () => {
                                 />
                                 <div className="conversation-info">
                                     <div className="conversation-name-row">
-                                        <h3>{conv.name}</h3>
+                                        <h3>
+                                            {conv.name}
+                                            {onlineUsers.includes(conv.id) && <span className="online-dot" style={{ width: 8, height: 8, background: '#4CAF50', borderRadius: '50%', display: 'inline-block', marginLeft: 6 }}></span>}
+                                        </h3>
                                         <span className="conversation-time">
                                             {conv.time ? new Date(conv.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                         </span>
@@ -158,7 +163,9 @@ const Chat = () => {
                                 />
                                 <div>
                                     <h2>{selected.name}</h2>
-                                    <span className="chat-status">{selected.online ? 'Online' : 'Offline'}</span>
+                                    <span className="chat-status" style={{ color: onlineUsers.includes(selected.id) ? '#4CAF50' : '#888' }}>
+                                        {onlineUsers.includes(selected.id) ? '● Online' : 'Offline'}
+                                    </span>
                                 </div>
                             </div>
                             <div className="chat-actions">

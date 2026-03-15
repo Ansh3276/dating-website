@@ -77,4 +77,20 @@ export const updateProfile = async (profileData) => {
   return response.data;
 };
 
+// --- CHAT API ---
+export const getConversations = async () => {
+  const response = await api.get('/chat/conversations');
+  return response.data;
+};
+
+export const getMessages = async (otherUserId) => {
+  const response = await api.get(`/chat/messages/${otherUserId}`);
+  return response.data;
+};
+
+export const sendMessage = async (receiverId, text) => {
+  const response = await api.post('/chat/messages', { receiverId, text });
+  return response.data;
+};
+
 export default api;

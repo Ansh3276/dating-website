@@ -43,6 +43,20 @@ exports.getConversations = async (req, res) => {
     try {
         const currentUserId = req.user.id;
 
+        // 0. ENSURE SYNC: Check for matched records that don't have conversations yet
+        const { Match } = require('../models');
+        const mutualMatches = await Match.findAll({
+            where: {
+                [Op.or]: [{ userId: currentUserId }, { targetUserId: currentUserId }],
+                status: 'matched'
+            }
+        });
+
+        for (const m of mutualMatches) {
+            const [u1, u2] = [m.userId, m.targetUserId].sort();
+            await Conversation.findOrCreate({ where: { userId1: u1, userId2: u2 } });
+        }
+
         // 1. Get all conversations involving the current user
         const conversations = await Conversation.findAll({
             where: {
@@ -70,7 +84,8 @@ exports.getConversations = async (req, res) => {
             });
 
             return {
-                id: otherUser.id,
+                id: otherUser.id, // We use the other user's ID as the conversation key for simplicity in messaging
+                conversationId: conv.id, // Keep the actual conv ID just in case
                 name: otherUser.name,
                 avatar: otherUser.photoUrl,
                 lastMsg: lastMsg ? lastMsg.text : 'Start chatting...',
