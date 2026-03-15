@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import MagneticButton from './ui/MagneticButton';
+import { useAuth } from '../context/AuthContext';
+import { getPhotoUrl } from '../services/api';
 import '../styles/Navbar.css';
 
 /**
@@ -15,10 +17,8 @@ const Navbar = () => {
     const [scrolled, setScrolled] = useState(true);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const navigate = useNavigate();
+    const { user, logout: contextLogout } = useAuth();
 
-    // Check for logged-in user
-    const userString = localStorage.getItem('userInfo');
-    const user = userString ? JSON.parse(userString) : null;
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         const previous = scrollY.getPrevious() ?? 0;
@@ -30,9 +30,15 @@ const Navbar = () => {
         setScrolled(latest > 50);
     });
 
-    const handleLogout = () => {
-        localStorage.removeItem('userInfo');
-        navigate('/login');
+    const handleLogout = async () => {
+        try {
+            const { logout } = await import('../services/api');
+            await logout();
+            contextLogout();
+            navigate('/login');
+        } catch (err) {
+            console.error('Logout failed', err);
+        }
     };
 
     return (
@@ -68,7 +74,7 @@ const Navbar = () => {
                                 data-cursor="pointer"
                             >
                                 <img 
-                                    src={user.photoUrl || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'} 
+                                    src={getPhotoUrl(user.photoUrl)} 
                                     alt={user.name} 
                                     className="nav-avatar" 
                                 />

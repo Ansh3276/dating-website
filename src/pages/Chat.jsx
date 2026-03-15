@@ -9,8 +9,24 @@ const Chat = () => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(true);
+    const messagesEndRef = React.useRef(null);
+    const [currentUser, setCurrentUser] = useState(null);
 
-    const currentUser = JSON.parse(localStorage.getItem('userInfo') || '{}');
+    React.useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const { getMe } = await import('../services/api');
+                setCurrentUser(await getMe());
+            } catch (err) {
+                console.error('Not logged in', err);
+            }
+        };
+        fetchUser();
+    }, []);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
     const loadConversations = async () => {
         try {
@@ -34,7 +50,7 @@ const Chat = () => {
             setMessages(data.map(m => ({
                 id: m.id,
                 text: m.text,
-                sent: m.senderId === currentUser.id
+                sent: currentUser ? m.senderId === currentUser.id : false
             })));
         } catch (err) {
             console.error('Failed to load messages', err);
@@ -48,8 +64,16 @@ const Chat = () => {
     React.useEffect(() => {
         if (selected) {
             loadMessages(selected.id);
+            const interval = setInterval(() => {
+                loadMessages(selected.id);
+            }, 3000); // Poll every 3 seconds for real-time feel
+            return () => clearInterval(interval);
         }
     }, [selected]);
+
+    React.useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     const handleSend = async () => {
         if (!input.trim() || !selected) return;
@@ -136,6 +160,7 @@ const Chat = () => {
                                     </motion.div>
                                 ))}
                             </AnimatePresence>
+                            <div ref={messagesEndRef} />
                         </div>
 
                         <div className="chat-input-area">
