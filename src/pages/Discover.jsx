@@ -3,58 +3,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-mo
 import Navbar from '../components/Navbar';
 import '../styles/Discover.css';
 
-const DISCOVER_DATA = [
-    {
-        id: 1,
-        name: 'Elena Vance',
-        age: 24,
-        location: 'Brooklyn, NY',
-        bio: 'Art director and weekend florist. I live for long walks in Central Park and hidden jazz bars.',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80',
-        tags: ['Jazz', 'Design', 'Flora'],
-        compatibility: 94,
-    },
-    {
-        id: 2,
-        name: 'Marcus Thorne',
-        age: 28,
-        location: 'Chelsea, NY',
-        bio: 'Tech founder by day, surfer by dawn. Looking for someone who values ambition and adventure.',
-        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80',
-        tags: ['Tech', 'Surfing', 'Adventure'],
-        compatibility: 87,
-    },
-    {
-        id: 3,
-        name: 'Sienna Miller',
-        age: 26,
-        location: 'Upper East Side, NY',
-        bio: 'Literature student with a love for classic cinema and vintage bookstores.',
-        image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80',
-        tags: ['Literature', 'Cinema', 'Vintage'],
-        compatibility: 91,
-    },
-    {
-        id: 4,
-        name: 'Julian Rose',
-        age: 30,
-        location: 'West Village, NY',
-        bio: 'Chef specializing in Italian cuisine. I believe a good meal can solve almost anything.',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
-        tags: ['Cooking', 'Wine', 'Travel'],
-        compatibility: 82,
-    },
-    {
-        id: 5,
-        name: 'Ava Lin',
-        age: 25,
-        location: 'SoHo, NY',
-        bio: 'Photographer and world traveler. Always chasing golden light and new stories.',
-        image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80',
-        tags: ['Photography', 'Travel', 'Culture'],
-        compatibility: 96,
-    },
-];
+
 
 /* ── Heart Particle Explosion ── */
 const HeartParticle = ({ x, y, delay }) => (
@@ -151,7 +100,10 @@ const DiscoverCard = ({ person, onSwipe, isTop, direction }) => {
                         <h2>{person.name}, {person.age}</h2>
                         <span className="compat-badge">{person.compatibility}%</span>
                     </div>
-                    <p className="discover-location">📍 {person.location}</p>
+                    <div className="discover-meta-row">
+                        <p className="discover-location">📍 {person.location}</p>
+                        <span className="discover-gender-tag">{person.gender}</span>
+                    </div>
                     <p className="discover-bio">{person.bio}</p>
                     <div className="discover-card-tags">
                         {person.tags.map(tag => (
@@ -173,8 +125,8 @@ const Discover = () => {
 
     const loadPeople = async () => {
         try {
-            const { getDiscoverUsers } = await import('../services/api');
-            const data = await getDiscoverUsers();
+            const apiServices = await import('../services/api');
+            const data = await apiServices.getDiscoverUsers();
             // Data mapping for local schema
             const mapped = data.map(u => ({
                 id: u.id,
@@ -182,8 +134,9 @@ const Discover = () => {
                 age: u.age,
                 location: u.location,
                 bio: u.bio,
-                image: u.photoUrl || 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&q=80',
-                tags: u.tags || [],
+                gender: u.gender || 'Not specified',
+                image: apiServices.getPhotoUrl(u.photoUrl),
+                tags: (typeof u.tags === 'string' ? JSON.parse(u.tags) : u.tags) || [],
                 compatibility: Math.floor(Math.random() * 15) + 85,
             }));
             setPeople(mapped);
@@ -272,10 +225,10 @@ const Discover = () => {
                             <p>Come back tomorrow for more curated matches.</p>
                             <button
                                 className="reset-btn"
-                                onClick={() => setPeople(DISCOVER_DATA)}
+                                onClick={loadPeople}
                                 data-cursor="pointer"
                             >
-                                Reset Discovery
+                                Refresh Discovery
                             </button>
                         </motion.div>
                     )}

@@ -4,57 +4,38 @@ const API_URL = 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_URL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add a request interceptor to include auth token
-api.interceptors.request.use(
-  (config) => {
-    try {
-      const userInfoStr = localStorage.getItem('userInfo');
-      console.log('API Request Interceptor - userInfo found:', !!userInfoStr);
-      
-      if (userInfoStr) {
-        const userInfo = JSON.parse(userInfoStr);
-        console.log('API Request Interceptor - token extracted:', !!userInfo?.token);
-        
-        if (userInfo && userInfo.token) {
-           config.headers['Authorization'] = `Bearer ${userInfo.token}`;
-        }
-      }
-    } catch (e) {
-      console.error('API Request Interceptor Error:', e);
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+export const getPhotoUrl = (path) => {
+  if (!path) return 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+  if (path.startsWith('http')) return path;
+  return `http://localhost:5000${path}`;
+};
+
+
 
 export const login = async (email, password) => {
   const response = await api.post('/auth/login', { email, password });
-  console.log('API Login Response Data:', response.data);
-  if (response.data) {
-    localStorage.setItem('userInfo', JSON.stringify(response.data));
-    console.log('Saved to localStorage:', localStorage.getItem('userInfo'));
-  }
-  return response.data;
+  return response.data; // Server handles session via cookie
 };
 
 export const register = async (userData) => {
   const response = await api.post('/auth/register', userData);
-  console.log('API Register Response Data:', response.data);
-  if (response.data) {
-    localStorage.setItem('userInfo', JSON.stringify(response.data));
-  }
+  return response.data; // Server handles session via cookie
+};
+
+export const logout = async () => {
+  const response = await api.post('/auth/logout');
   return response.data;
 };
 
-export const logout = () => {
-  localStorage.removeItem('userInfo');
+export const getMe = async () => {
+  const response = await api.get('/auth/me');
+  return response.data;
 };
 
 export const getDiscoverUsers = async () => {
@@ -64,6 +45,16 @@ export const getDiscoverUsers = async () => {
 
 export const getMatches = async () => {
   const response = await api.get('/users/matches');
+  return response.data;
+};
+
+export const getPendingLikes = async () => {
+  const response = await api.get('/users/pending');
+  return response.data;
+};
+
+export const getIncomingLikes = async () => {
+  const response = await api.get('/users/incoming');
   return response.data;
 };
 
@@ -78,7 +69,11 @@ export const getProfile = async () => {
 };
 
 export const updateProfile = async (profileData) => {
-  const response = await api.put('/users/profile', profileData);
+  const response = await api.put('/users/profile', profileData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 

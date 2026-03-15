@@ -96,6 +96,25 @@
     border: 1px solid rgba(255,255,255,0.2);
 }
 
+.discover-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.discover-gender-tag {
+    padding: 3px 10px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: white;
+    letter-spacing: 0.05em;
+}
+
 /* ── Swipe Labels ── */
 .swipe-label {
     position: absolute;
