@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { getPhotoUrl } from '../services/api';
 import '../styles/Chat.css';
 
 const Chat = () => {
+    const location = useLocation();
     const [conversations, setConversations] = useState([]);
     const [selected, setSelected] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -33,7 +36,13 @@ const Chat = () => {
             const { getConversations } = await import('../services/api');
             const data = await getConversations();
             setConversations(data);
-            if (data.length > 0 && !selected) {
+            
+            // Check for passed userId in navigation state
+            const targetId = location.state?.userId;
+            if (targetId) {
+                const found = data.find(c => c.id === targetId);
+                if (found) setSelected(found);
+            } else if (data.length > 0 && !selected) {
                 setSelected(data[0]);
             }
         } catch (err) {
@@ -112,7 +121,12 @@ const Chat = () => {
                                 className={`conversation-item ${selected?.id === conv.id ? 'active' : ''}`}
                                 onClick={() => setSelected(conv)}
                             >
-                                <img src={conv.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80'} alt={conv.name} className="conversation-avatar" />
+                                <img 
+                                    src={getPhotoUrl(conv.avatar)} 
+                                    alt={conv.name} 
+                                    className="conversation-avatar" 
+                                    onError={(e) => e.target.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
+                                />
                                 <div className="conversation-info">
                                     <div className="conversation-name-row">
                                         <h3>{conv.name}</h3>
@@ -135,7 +149,13 @@ const Chat = () => {
                     <>
                         <header className="chat-header">
                             <div className="chat-user-info">
-                                <img src={selected.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80'} alt={selected.name} className="conversation-avatar" style={{ width: 45, height: 45 }} />
+                                <img 
+                                    src={getPhotoUrl(selected.avatar)} 
+                                    alt={selected.name} 
+                                    className="conversation-avatar" 
+                                    style={{ width: 45, height: 45 }} 
+                                    onError={(e) => e.target.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
+                                />
                                 <div>
                                     <h2>{selected.name}</h2>
                                     <span className="chat-status">{selected.online ? 'Online' : 'Offline'}</span>
@@ -147,6 +167,11 @@ const Chat = () => {
                         </header>
 
                         <div className="chat-messages">
+                            {messages.length === 0 && (
+                                <div className="chat-empty-new">
+                                    <p>Say hello to start the conversation! 👋</p>
+                                </div>
+                            )}
                             <AnimatePresence initial={false}>
                                 {messages.map((msg) => (
                                     <motion.div

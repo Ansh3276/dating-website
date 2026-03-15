@@ -77,6 +77,7 @@ const Navbar = () => {
                                     src={getPhotoUrl(user.photoUrl)} 
                                     alt={user.name} 
                                     className="nav-avatar" 
+                                    onError={(e) => e.target.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
                                 />
                                 <AnimatePresence>
                                     {showProfileMenu && (

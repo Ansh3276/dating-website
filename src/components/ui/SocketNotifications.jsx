@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '../../context/SocketContext';
-import { actionUser } from '../../services/api';
+import { actionUser, getPhotoUrl } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const SocketNotifications = () => {
@@ -72,7 +72,12 @@ const SocketNotifications = () => {
                         }}
                     >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                            <img src={user.photoUrl} alt={user.name} style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover' }} />
+                            <img 
+                                src={getPhotoUrl(user.photoUrl)} 
+                                alt={user.name} 
+                                onError={(e) => e.target.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
+                                style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover' }} 
+                            />
                             <div>
                                 <h4 style={{ margin: 0, fontSize: '1rem', color: '#111' }}>🔥 Someone liked you!</h4>
                                 <p style={{ margin: 0, fontSize: '0.9rem', color: '#666' }}>User: {user.name}</p>
@@ -124,13 +129,18 @@ const SocketNotifications = () => {
                             <p style={{ fontSize: '1.2rem', color: '#333', marginBottom: '24px' }}>
                                 You and <strong>{matchPopup.name}</strong> liked each other.
                             </p>
-                            <img src={matchPopup.photoUrl} alt={matchPopup.name} style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', border: '4px solid #E91E63', marginBottom: '24px' }} />
+                            <img 
+                                src={getPhotoUrl(matchPopup.photoUrl)} 
+                                alt={matchPopup.name} 
+                                onError={(e) => e.target.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
+                                style={{ width: 120, height: 120, borderRadius: '50%', objectFit: 'cover', border: '4px solid #E91E63', marginBottom: '24px' }} 
+                            />
                             
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 <button 
                                     onClick={() => {
                                         setMatchPopup(null);
-                                        navigate('/chat');
+                                        navigate('/chat', { state: { userId: matchPopup.id } });
                                     }}
                                     style={{ background: '#E91E63', color: '#fff', border: 'none', padding: '14px', borderRadius: '12px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 'bold' }}
                                 >

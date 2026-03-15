@@ -1,4 +1,4 @@
-const { Message, User } = require('../models');
+const { Message, User, Conversation } = require('../models');
 const { Op } = require('sequelize');
 
 exports.sendMessage = async (req, res) => {
@@ -43,35 +43,43 @@ exports.getConversations = async (req, res) => {
     try {
         const currentUserId = req.user.id;
 
-        // Find all unique users the current user has chatted with
-        const messages = await Message.findAll({
+        // 1. Get all conversations involving the current user
+        const conversations = await Conversation.findAll({
             where: {
-                [Op.or]: [{ senderId: currentUserId }, { receiverId: currentUserId }]
+                [Op.or]: [{ userId1: currentUserId }, { userId2: currentUserId }]
             },
             include: [
-                { model: User, as: 'sender', attributes: ['id', 'name', 'photoUrl'] },
-                { model: User, as: 'receiver', attributes: ['id', 'name', 'photoUrl'] }
-            ],
-            order: [['createdAt', 'DESC']]
+                { model: User, as: 'user1', attributes: ['id', 'name', 'photoUrl'] },
+                { model: User, as: 'user2', attributes: ['id', 'name', 'photoUrl'] }
+            ]
         });
 
-        const conversationsMap = new Map();
+        // 2. Formulate the response with last message logic
+        const formattedConversations = await Promise.all(conversations.map(async (conv) => {
+            const otherUser = conv.userId1 === currentUserId ? conv.user2 : conv.user1;
+            
+            // Get last message for this pair
+            const lastMsg = await Message.findOne({
+                where: {
+                    [Op.or]: [
+                        { senderId: currentUserId, receiverId: otherUser.id },
+                        { senderId: otherUser.id, receiverId: currentUserId },
+                    ],
+                },
+                order: [['createdAt', 'DESC']]
+            });
 
-        messages.forEach(msg => {
-            const otherUser = msg.senderId === currentUserId ? msg.receiver : msg.sender;
-            if (!conversationsMap.has(otherUser.id)) {
-                conversationsMap.set(otherUser.id, {
-                    id: otherUser.id,
-                    name: otherUser.name,
-                    avatar: otherUser.photoUrl,
-                    lastMsg: msg.text,
-                    time: msg.createdAt,
-                    online: false // Static for now
-                });
-            }
-        });
+            return {
+                id: otherUser.id,
+                name: otherUser.name,
+                avatar: otherUser.photoUrl,
+                lastMsg: lastMsg ? lastMsg.text : 'Start chatting...',
+                time: lastMsg ? lastMsg.createdAt : conv.createdAt,
+                online: false
+            };
+        }));
 
-        res.json(Array.from(conversationsMap.values()));
+        res.json(formattedConversations);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

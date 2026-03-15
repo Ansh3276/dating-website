@@ -84,6 +84,7 @@ const DiscoverCard = ({ person, onSwipe, isTop, direction }) => {
                 alt={person.name} 
                 className="discover-card-img" 
                 draggable={false}
+                onError={(e) => e.target.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
             />
 
             {/* LIKE / NOPE overlays */}

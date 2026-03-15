@@ -118,7 +118,11 @@ const Profile = () => {
                     <div className="profile-header-card">
                         <div className="profile-avatar-section">
                             <div className="profile-main-avatar">
-                                <img src={imagePreview || NO_DP} alt={user.name} />
+                                <img 
+                                    src={imagePreview || getPhotoUrl(null)} 
+                                    alt={user.name} 
+                                    onError={(e) => e.target.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
+                                />
                                 {isEditing && (
                                     <label className="avatar-edit-overlay">
                                         <input 

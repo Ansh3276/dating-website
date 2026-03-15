@@ -68,10 +68,22 @@ const Matches = () => {
         try {
             const { actionUser } = await import('../services/api');
             await actionUser(targetId, 'liked');
-            // Optimistic update: move from incoming to mutual if they accepted
+            // Optimistic update: move to mutual if they accepted
+            setList(prev => prev.filter(u => u.id !== targetId));
             setActiveTab('mutual');
         } catch (err) {
             console.error('Failed to accept match', err);
+        }
+    };
+
+    const handleDecline = async (targetId) => {
+        try {
+            const { actionUser } = await import('../services/api');
+            await actionUser(targetId, 'passed');
+            // Remove from local list immediately
+            setList(prev => prev.filter(u => u.id !== targetId));
+        } catch (err) {
+            console.error('Failed to decline like', err);
         }
     };
 
@@ -130,7 +142,11 @@ const Matches = () => {
                                         transition={{ duration: 0.5, delay: i * 0.05 }}
                                     >
                                         <div className="match-card-img-wrapper">
-                                            <img src={m.photo} alt={m.name} />
+                                            <img 
+                                                src={m.photo} 
+                                                alt={m.name} 
+                                                onError={(e) => e.target.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
+                                            />
                                             {activeTab === 'mutual' && <Ring pct={m.pct} />}
                                         </div>
                                         <div className="match-card-body">
@@ -143,7 +159,7 @@ const Matches = () => {
                                             
                                             <div className="match-card-actions">
                                                 {activeTab === 'mutual' && (
-                                                    <button className="chat-btn" onClick={() => navigate('/chat')}>
+                                                    <button className="chat-btn" onClick={() => navigate('/chat', { state: { userId: m.id } })}>
                                                         Send Message
                                                     </button>
                                                 )}
@@ -152,7 +168,7 @@ const Matches = () => {
                                                         <button className="accept-btn" onClick={() => handleAccept(m.id)}>
                                                             Accept Match
                                                         </button>
-                                                        <button className="decline-btn" onClick={() => navigate('/discover')}>
+                                                        <button className="decline-btn" onClick={() => handleDecline(m.id)}>
                                                             Decline
                                                         </button>
                                                     </div>

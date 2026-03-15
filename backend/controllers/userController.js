@@ -1,4 +1,4 @@
-const { User, Match } = require('../models');
+const { User, Match, Conversation } = require('../models');
 const { Op } = require('sequelize');
 const { emitToUser } = require('../socketHandler');
 
@@ -112,10 +112,14 @@ exports.actionUser = async (req, res) => {
     try {
         const existing = await Match.findOne({ where: { userId, targetUserId }});
         if (existing) {
-            return res.status(400).json({ message: 'You have already swiped on this user' });
+            if (existing.status === action) {
+                return res.status(400).json({ message: 'You have already performed this action' });
+            }
+            existing.status = action;
+            await existing.save();
+        } else {
+            await Match.create({ userId, targetUserId, status: action });
         }
-        
-        await Match.create({ userId, targetUserId, status: action });
 
         if (action === 'liked') {
             const targetUser = await User.findByPk(targetUserId, { attributes: ['name', 'photoUrl'] });
@@ -125,16 +129,23 @@ exports.actionUser = async (req, res) => {
                 where: { userId: targetUserId, targetUserId: userId, status: 'liked' }
             });
 
-            if (reciprocalLike) {
-                 // Both liked each other! Upgrade status to 'matched'
-                 reciprocalLike.status = 'matched';
-                 await reciprocalLike.save();
-                 await Match.update({ status: 'matched' }, { where: { userId, targetUserId } });
-                 
-                 // Notify BOTH users instantly
-                 emitToUser(userId, 'newMatch', { id: targetUserId, name: targetUser.name, photoUrl: targetUser.photoUrl });
-                 emitToUser(targetUserId, 'newMatch', { id: userId, name: req.user.name, photoUrl: req.user.photoUrl });
-            } else {
+             if (reciprocalLike) {
+                  // Both liked each other! Upgrade status to 'matched'
+                  reciprocalLike.status = 'matched';
+                  await reciprocalLike.save();
+                  await Match.update({ status: 'matched' }, { where: { userId, targetUserId } });
+                  
+                  // CREATE CONVERSATION persistency
+                  // userId1 should always be the smaller UUID for consistency
+                  const [u1, u2] = [userId, targetUserId].sort();
+                  await Conversation.findOrCreate({
+                      where: { userId1: u1, userId2: u2 }
+                  });
+
+                  // Notify BOTH users instantly
+                  emitToUser(userId, 'newMatch', { id: targetUserId, name: targetUser.name, photoUrl: targetUser.photoUrl });
+                  emitToUser(targetUserId, 'newMatch', { id: userId, name: req.user.name, photoUrl: req.user.photoUrl });
+             } else {
                  // Standard notification to target user
                  emitToUser(targetUserId, 'receiveLike', { id: userId, name: req.user.name, photoUrl: req.user.photoUrl });
             }
