@@ -22,6 +22,13 @@ import VideoDate from './pages/VideoDate';
 import Notifications from './pages/Notifications';
 import Settings from './pages/Settings';
 
+// Admin imports
+import AdminLayout from './components/admin/AdminLayout';
+import DashboardOverview from './pages/admin/DashboardOverview';
+import UserManagement from './pages/admin/UserManagement';
+import MatchesAdmin from './pages/admin/MatchesAdmin';
+import SettingsAdmin from './pages/admin/SettingsAdmin';
+
 import './styles/global.css';
 
 const PageTransition = ({ children }) => {
@@ -60,6 +67,15 @@ const AnimatedRoutes = () => {
         <Route path="/video-date" element={<PageTransition><ProtectedRoute><VideoDate /></ProtectedRoute></PageTransition>} />
         <Route path="/notifications" element={<PageTransition><ProtectedRoute><Notifications /></ProtectedRoute></PageTransition>} />
         <Route path="/settings" element={<PageTransition><ProtectedRoute><Settings /></ProtectedRoute></PageTransition>} />
+        
+        {/* Admin routes */}
+        <Route path="/admin" element={<PageTransition><ProtectedRoute><AdminLayout /></ProtectedRoute></PageTransition>}>
+          <Route index element={<DashboardOverview />} />
+          <Route path="dashboard" element={<DashboardOverview />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="matches" element={<MatchesAdmin />} />
+          <Route path="settings" element={<SettingsAdmin />} />
+        </Route>
       </Routes>
     </AnimatePresence>
   );
