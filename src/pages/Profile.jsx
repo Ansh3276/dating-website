@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import FloatingBackground from '../components/ui/FloatingBackground';
+import LocationInput from '../components/LocationInput';
 import { getPhotoUrl } from '../services/api';
 import '../styles/Profile.css';
 
@@ -151,6 +152,13 @@ const Profile = () => {
                                             onChange={(e) => setEditForm({...editForm, age: e.target.value})} 
                                             placeholder="Age"
                                         />
+                                        <div style={{ marginTop: '8px' }}>
+                                            <LocationInput 
+                                                value={editForm.location} 
+                                                onChange={(loc) => setEditForm({...editForm, location: loc})} 
+                                                placeholder="Your Location"
+                                            />
+                                        </div>
                                     </div>
                                 ) : (
                                     <>

@@ -3,7 +3,21 @@ const { User } = require('../models');
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, name, age, location, bio, gender, showMe, tags } = req.body;
+    const { email, password, name, age, location, bio, gender, showMe } = req.body;
+    let tags = req.body.tags;
+
+    if (typeof tags === 'string') {
+        try {
+            tags = JSON.parse(tags);
+        } catch (e) {
+            tags = [];
+        }
+    }
+
+    let photoUrl = req.body.photoUrl || null;
+    if (req.file) {
+        photoUrl = `/uploads/${req.file.filename}`;
+    }
 
     const userExists = await User.findOne({ where: { email } });
     if (userExists) {
@@ -22,7 +36,8 @@ exports.register = async (req, res) => {
       bio,
       gender,
       showMe,
-      tags
+      tags,
+      photoUrl
     });
 
     if (user) {

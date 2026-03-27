@@ -24,7 +24,10 @@ export const login = async (email, password) => {
 };
 
 export const register = async (userData) => {
-  const response = await api.post('/auth/register', userData);
+  const isFormData = userData instanceof FormData;
+  const response = await api.post('/auth/register', userData, {
+    headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : { 'Content-Type': 'application/json' }
+  });
   return response.data; // Server handles session via cookie
 };
 
@@ -74,6 +77,17 @@ export const updateProfile = async (profileData) => {
       'Content-Type': 'multipart/form-data',
     },
   });
+  return response.data;
+};
+
+// --- LOCATION API ---
+export const searchLocations = async (query) => {
+  const response = await api.get(`/location/autocomplete?q=${encodeURIComponent(query)}`);
+  return response.data;
+};
+
+export const reverseGeocode = async (lat, lon) => {
+  const response = await api.get(`/location/reverse?lat=${lat}&lon=${lon}`);
   return response.data;
 };
 

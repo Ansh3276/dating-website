@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import FloatingBackground from '../components/ui/FloatingBackground';
+import LocationInput from '../components/LocationInput';
 import '../styles/Auth.css';
 import '../styles/Signup.css';
 import { useAuth } from '../context/AuthContext';
@@ -32,8 +33,8 @@ const Signup = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(0);
     const [form, setForm] = useState({
-        firstName: '', age: '', email: '', password: '',
-        bio: '', interests: [],
+        firstName: '', age: '', email: '', password: '', location: '',
+        bio: '', interests: [], photoFile: null, photoPreview: null,
         gender: '', showMe: ''
     });
 
@@ -42,6 +43,17 @@ const Signup = () => {
     const { login: contextLogin } = useAuth();
 
     const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setForm(prev => ({ ...prev, photoFile: file, photoPreview: reader.result }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const toggleInterest = (i) => {
         const cur = form.interests;
@@ -59,17 +71,21 @@ const Signup = () => {
              setError('');
              setLoading(true);
              try {
-                 const userData = await register({
-                     name: form.firstName,
-                     age: form.age,
-                     email: form.email,
-                     password: form.password,
-                     bio: form.bio,
-                     gender: form.gender,
-                     showMe: form.showMe,
-                     location: 'Local', 
-                     tags: form.interests
-                 });
+                 const formData = new FormData();
+                 formData.append('name', form.firstName);
+                 formData.append('age', form.age);
+                 formData.append('email', form.email);
+                 formData.append('password', form.password);
+                 formData.append('bio', form.bio);
+                 formData.append('gender', form.gender);
+                 formData.append('showMe', form.showMe);
+                 formData.append('location', form.location || 'Unknown');
+                 formData.append('tags', JSON.stringify(form.interests));
+                 if (form.photoFile) {
+                     formData.append('photo', form.photoFile);
+                 }
+
+                 const userData = await register(formData);
                  contextLogin(userData);
                  setStep(3); // Go to done step
              } catch (err) {
@@ -136,6 +152,13 @@ const Signup = () => {
                                             <label className="field-label">Password</label>
                                             <input className="field-input" name="password" type="password" placeholder="••••••••" value={form.password} onChange={change} />
                                         </div>
+                                        <div style={{ gridColumn: '1 / -1' }}>
+                                            <label className="field-label">Location</label>
+                                            <LocationInput 
+                                                value={form.location} 
+                                                onChange={(loc) => setForm({ ...form, location: loc })} 
+                                            />
+                                        </div>
                                     </div>
 
                                     <div className="signup-gender-section">
@@ -160,6 +183,24 @@ const Signup = () => {
                                 <motion.div key="step1" variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.35 }}>
                                     <h1>Your story.</h1>
                                     <p className="subtitle">Write a bio that captures who you really are — not just what you do.</p>
+                                    
+                                    <div className="signup-photo-upload">
+                                        <div className="signup-photo-preview">
+                                            {form.photoPreview ? (
+                                                <img src={form.photoPreview} alt="Preview" />
+                                            ) : (
+                                                <div className="signup-photo-placeholder">👤</div>
+                                            )}
+                                        </div>
+                                        <div className="signup-photo-actions">
+                                            <label className="signup-photo-label">
+                                                <input type="file" accept="image/*" onChange={handleFileChange} />
+                                                <span>{form.photoPreview ? 'Change Photo' : 'Upload Profile Photo'}</span>
+                                            </label>
+                                            <div className="signup-photo-optional">Optional — you can skip and add this later</div>
+                                        </div>
+                                    </div>
+
                                     <div className="field-group">
                                         <div>
                                             <label className="field-label">Bio</label>
