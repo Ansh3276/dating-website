@@ -6,6 +6,8 @@ import FloatingBackground from '../components/ui/FloatingBackground';
 import '../styles/Auth.css';
 import '../styles/Signup.css';
 import { useAuth } from '../context/AuthContext';
+import { register } from '../services/api';
+import CrushlyLogo from '../assets/crushly-logo.svg';
 
 const STEPS = [
     { id: 0, label: 'About You' },
@@ -94,7 +96,8 @@ const Signup = () => {
                     transition={{ duration: 0.7 }}
                 >
                     <Link to="/" className="auth-logo">
-                        <span>NANO</span><strong>MATCH</strong>
+                        <img src={CrushlyLogo} alt="Crushly" className="auth-logo-icon" />
+                        <span className="auth-logo-text">Crushly</span>
                     </Link>
 
                     {/* Step progress */}

@@ -19,6 +19,11 @@ const Message = sequelize.define('Message', {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  status: {
+    type: DataTypes.ENUM('sent', 'delivered', 'seen'),
+    defaultValue: 'sent',
+    allowNull: false,
+  },
 });
 
 module.exports = Message;

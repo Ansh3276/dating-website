@@ -51,7 +51,7 @@ const Landing = () => {
                     variant="light"
                     eyebrow="Member Stories"
                     title="Where Stories Begin."
-                    body="Every connection on Nano Match is the start of something extraordinary. Our members don't date — they discover."
+                    body="Every connection on Crushly is the start of something extraordinary. Our members don't date — they discover."
                     videoSrc="https://videos.pexels.com/video-files/3754418/3754418-hd_1920_1080_24fps.mp4"
                 />
 

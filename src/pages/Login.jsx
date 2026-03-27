@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import FloatingBackground from '../components/ui/FloatingBackground';
 import { useAuth } from '../context/AuthContext';
+import CrushlyLogo from '../assets/crushly-logo.svg';
 import '../styles/Auth.css';
 
 const Login = () => {
@@ -44,7 +45,8 @@ const Login = () => {
                     transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                 >
                     <Link to="/" className="auth-logo">
-                        <span>NANO</span><strong>MATCH</strong>
+                        <img src={CrushlyLogo} alt="Crushly" className="auth-logo-icon" />
+                        <span className="auth-logo-text">Crushly</span>
                     </Link>
 
                     <div className="auth-card">
@@ -98,7 +100,7 @@ const Login = () => {
                         </button>
 
                         <p className="auth-footer-text">
-                            Don't have an account? <Link to="/signup">Apply for membership</Link>
+                            Don't have an account? <Link to="/signup">Create your account</Link>
                         </p>
                     </div>
                 </motion.div>

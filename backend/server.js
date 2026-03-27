@@ -66,7 +66,7 @@ server.listen(PORT, async () => {
   // Sync database models (creates tables if they don't exist)
   try {
     const { sequelize } = require('./models/index');
-    await sequelize.sync({ force: false }); // Change to true carefully to drop existing tables during dev
+    await sequelize.sync({ alter: true }); // Automatically alters tables without dropping to add the new 'status' column
     console.log('Database synced.');
   } catch (error) {
     console.error('Failed to sync database:', error);

@@ -18,7 +18,7 @@ const Testimonials = () => {
     const x2 = useTransform(scrollYProgress, [0, 1], ["-50%", "10%"]);
 
     const testimonialsRow1 = [
-        { quote: "I never thought an algorithm could understand chemistry. Nano Match proved me wrong.", author: "Sarah T.", location: "New York" },
+        { quote: "I never thought an algorithm could understand chemistry. Crushly proved me wrong.", author: "Sarah T.", location: "New York" },
         { quote: "The voice prompt feature changed everything. I heard his laugh before we'd ever met.", author: "Elena R.", location: "Paris" },
         { quote: "Three months in, and we're moving to the coast together. It began with one curated reveal.", author: "Daniel M.", location: "London" },
         { quote: "No swiping fatigue. Just one perfect match a day. I actually looked forward to opening the app.", author: "Michael B.", location: "Los Angeles" },

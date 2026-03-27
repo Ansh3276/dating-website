@@ -145,7 +145,7 @@ const HeroScrollAnimation = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 1, delay: 0.3 }}
                         >
-                            Nano Match
+                            Crushly
                         </motion.h1>
                         <div className="progress-bar-container">
                             <motion.div

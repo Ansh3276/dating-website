@@ -1,5 +1,6 @@
 import React from 'react';
 import MagneticButton from './ui/MagneticButton';
+import CrushlyLogo from '../assets/crushly-logo.svg';
 import '../styles/Footer.css';
 
 /**
@@ -12,8 +13,11 @@ const Footer = () => {
             <div className="footer-container">
                 <div className="footer-top">
                     <div className="footer-brand">
-                        <h2>NANO<span className="text-gradient">MATCH</span></h2>
-                        <p>Redefining romance for the modern elite. A cinematic journey into the future of connection.</p>
+                        <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <img src={CrushlyLogo} alt="Crushly" style={{ width: '28px', height: '28px' }} />
+                            <span style={{ background: 'linear-gradient(135deg, #F5A0B1, #e8758a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Crushly</span>
+                        </h2>
+                        <p>Redefining romance for the modern era. A cinematic journey into the future of connection.</p>
                     </div>
                     
                     <div className="footer-links">
@@ -33,7 +37,7 @@ const Footer = () => {
                 </div>
                 
                 <div className="footer-bottom">
-                    <p>&copy; {new Date().getFullYear()} Nano Match. All rights reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} Crushly. All rights reserved.</p>
                     <div className="social-links">
                         <MagneticButton className="social-link">IG</MagneticButton>
                         <MagneticButton className="social-link">TW</MagneticButton>

@@ -1,16 +1,28 @@
 const { Message, User, Conversation } = require('../models');
 const { Op } = require('sequelize');
 
+const { emitToUser, getIo, isUserOnline } = require('../socketHandler');
+
 exports.sendMessage = async (req, res) => {
   try {
     const { receiverId, text } = req.body;
     const senderId = req.user.id;
 
+    const receiverOnline = isUserOnline(receiverId);
+    
     const message = await Message.create({
       senderId,
       receiverId,
       text,
+      status: receiverOnline ? 'delivered' : 'sent'
     });
+
+    // Fire socket event to the receiver
+    if (receiverOnline) {
+      emitToUser(receiverId, 'receive_message', message);
+      // Immediately tell sender it was delivered
+      emitToUser(senderId, 'message_delivered', message.id);
+    }
 
     res.status(201).json(message);
   } catch (error) {

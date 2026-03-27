@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import MagneticButton from './ui/MagneticButton';
 import { useAuth } from '../context/AuthContext';
 import { getPhotoUrl } from '../services/api';
+import CrushlyLogo from '../assets/crushly-logo.svg';
 import '../styles/Navbar.css';
 
 /**
@@ -53,8 +54,8 @@ const Navbar = () => {
         >
             <div className="nav-container">
                 <Link to="/" className="nav-logo" data-cursor="pointer">
-                    <span>NANO</span>
-                    <span className="text-gradient">MATCH</span>
+                    <img src={CrushlyLogo} alt="Crushly" className="nav-logo-icon" />
+                    <span className="nav-logo-text">Crushly</span>
                 </Link>
 
                 <ul className="nav-links">
@@ -100,7 +101,7 @@ const Navbar = () => {
                             <Link to="/login" className="login-link" data-cursor="pointer">Log in</Link>
                             <Link to="/signup">
                                 <MagneticButton className="join-btn" data-cursor="pointer">
-                                    Apply Now
+                                    New User? Join Now
                                 </MagneticButton>
                             </Link>
                         </>
