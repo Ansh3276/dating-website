@@ -6,7 +6,7 @@
 
 ## ✨ Features
 
-### 🔐 Authentication & Profiles
+### 🔐 Authentication & Profile
 - Secure user registration and login with **JWT** and **bcrypt** password hashing
 - Multi-step signup flow — name, age, gender, bio, interests, and dating preferences
 - Profile photo upload via **Multer** with editable profile page
